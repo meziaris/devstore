@@ -7,8 +7,8 @@ type GetCategoryResp struct {
 }
 
 type CreateCategoryReq struct {
-	Name        string `form:"name" json:"name" binding:"required"`
-	Description string `form:"description" json:"description" binding:"required"`
+	Name        string `form:"name" json:"name" validate:"required"`
+	Description string `form:"description" json:"description" validate:"required"`
 }
 
 type UpdateCategoryReq struct {
