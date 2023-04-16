@@ -42,15 +42,29 @@ func main() {
 		middleware.RecoveryMiddleware(),
 	)
 
+	// repository
 	categoryRepository := repository.NewCategoryRepository(DBConn)
+	productRepository := repository.NewProducRepository(DBConn)
+
+	// service
 	categoryService := service.NewCategoryService(categoryRepository)
+	productService := service.NewProductService(productRepository, categoryRepository)
+
+	// controller
 	categoryController := controller.NewCategoryController(categoryService)
+	productController := controller.NewProductController(productService)
 
 	r.GET("/category", categoryController.BrowseCategory)
 	r.POST("/category", categoryController.CreateCategory)
 	r.POST("/category/:id", categoryController.DetailCategory)
 	r.PATCH("/category/:id", categoryController.UpdateCategory)
 	r.DELETE("/category/:id", categoryController.DeleteCategory)
+
+	r.GET("/product", productController.BrowseProduct)
+	r.POST("/product", productController.CreateProduct)
+	r.GET("/product/:id", productController.DetailProduct)
+	r.PATCH("/product/:id", productController.UpdateProduct)
+	r.DELETE("/product/:id", productController.DeleteProduct)
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
 	r.Run(appPort)
