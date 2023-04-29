@@ -20,6 +20,8 @@ func LoadConfig(fileConfigPath string) (Config, error) {
 		return config, err
 	}
 
-	viper.Unmarshal(&config)
+	if err := viper.Unmarshal(&config); err != nil {
+		return config, err
+	}
 	return config, nil
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/meziaris/devstore/internal/pkg/config"
 	"github.com/meziaris/devstore/internal/pkg/db"
 	"github.com/meziaris/devstore/internal/pkg/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 var cfg config.Config
@@ -67,5 +68,7 @@ func main() {
 	r.DELETE("/product/:id", productController.DeleteProduct)
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
-	r.Run(appPort)
+	if err := r.Run(appPort); err != nil {
+		logrus.Fatal(fmt.Errorf("cann't start app: %w", err))
+	}
 }
