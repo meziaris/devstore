@@ -11,8 +11,8 @@ permissions:
   contents: read # to fetch code (actions/checkout)
 
 jobs:
-  lint:
-    name: Run unit tests
+  test:
+    name: Run unit tests and build
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
