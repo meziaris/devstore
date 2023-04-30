@@ -65,7 +65,7 @@ func main() {
 
 	r.GET("/category", categoryController.BrowseCategory)
 	r.POST("/category", categoryController.CreateCategory)
-	r.POST("/category/:id", categoryController.DetailCategory)
+	r.GET("/category/:id", categoryController.DetailCategory)
 	r.PATCH("/category/:id", categoryController.UpdateCategory)
 	r.DELETE("/category/:id", categoryController.DeleteCategory)
 

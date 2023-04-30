@@ -7,6 +7,7 @@ import (
 	"github.com/meziaris/devstore/internal/app/model"
 	"github.com/meziaris/devstore/internal/app/repository"
 	"github.com/meziaris/devstore/internal/app/schema"
+	"github.com/meziaris/devstore/internal/pkg/reason"
 )
 
 type CategoryService struct {
@@ -58,7 +59,7 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 	category, err := cs.repo.GetByID(id)
 	if err != nil {
 		fmt.Println(err)
-		return resp, errors.New("cannot get detail category")
+		return resp, errors.New(reason.CategoryCannotGetDetail)
 	}
 
 	resp.ID = category.ID
