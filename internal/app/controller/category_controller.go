@@ -21,7 +21,7 @@ func NewCategoryController(service service.ICategoryService) *CategoryController
 func (cc *CategoryController) CreateCategory(ctx *gin.Context) {
 	req := schema.CreateCategoryReq{}
 
-	if handler.BindAndCheck(ctx, req) {
+	if handler.BindAndCheck(ctx, &req) {
 		return
 	}
 
@@ -53,34 +53,34 @@ func (cc *CategoryController) DetailCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": resp})
+	handler.ResponseSuccess(ctx, http.StatusOK, "success found the category", resp)
 }
 
-// update article by id
+// update category by id
 func (cc *CategoryController) UpdateCategory(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
-	var req schema.UpdateCategoryReq
+	req := schema.UpdateCategoryReq{}
 
-	if handler.BindAndCheck(ctx, req) {
+	if handler.BindAndCheck(ctx, &req) {
 		return
 	}
 
 	err := cc.service.UpdateByID(id, req)
 	if err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot update category")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success update category", req)
+	handler.ResponseSuccess(ctx, http.StatusOK, "success update category", nil)
 }
 
-// delete article by id
+// delete category by id
 func (cc *CategoryController) DeleteCategory(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 
 	err := cc.service.DeleteByID(id)
 	if err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot delete category")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
