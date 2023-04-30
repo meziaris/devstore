@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -12,7 +11,7 @@ import (
 	"github.com/meziaris/devstore/internal/pkg/config"
 	"github.com/meziaris/devstore/internal/pkg/db"
 	"github.com/meziaris/devstore/internal/pkg/middleware"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 var cfg config.Config
@@ -22,17 +21,26 @@ func init() {
 	// read config
 	loadConfig, err := config.LoadConfig("./")
 	if err != nil {
-		log.Panic("cannot load app config")
+		log.Fatal("cannot load app config")
 	}
 	cfg = loadConfig
 
 	// connect database
 	db, err := db.ConnectDB(cfg.DBDriver, cfg.DBConnection)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	DBConn = db
+
+	// setup logrus
+	logLevel, err := log.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logLevel = log.InfoLevel
+	}
+
+	log.SetLevel(logLevel)                 // apply log level
+	log.SetFormatter(&log.JSONFormatter{}) // define format using json
 }
 
 func main() {
@@ -69,6 +77,6 @@ func main() {
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
 	if err := r.Run(appPort); err != nil {
-		logrus.Fatal(fmt.Errorf("cann't start app: %w", err))
+		log.Fatal(fmt.Errorf("cann't start app: %w", err))
 	}
 }
