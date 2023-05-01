@@ -8,6 +8,7 @@ import (
 	"github.com/meziaris/devstore/internal/app/model"
 	"github.com/meziaris/devstore/internal/app/repository"
 	"github.com/meziaris/devstore/internal/app/schema"
+	"github.com/meziaris/devstore/internal/pkg/reason"
 )
 
 type ProductService struct {
@@ -31,7 +32,7 @@ func (s *ProductService) Create(req *schema.CreateProductReq) error {
 
 	categoryID := strconv.Itoa(req.CategoryID)
 	if _, err := s.categoryRepo.GetByID(categoryID); err != nil {
-		return errors.New("category not found")
+		return errors.New(reason.CategoryNotFound)
 	}
 
 	if err := s.productRepo.Create(inserData); err != nil {
@@ -46,7 +47,7 @@ func (s *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
 
 	products, err := s.productRepo.Browse()
 	if err != nil {
-		return resp, err
+		return resp, errors.New(reason.ProductCannotBrowse)
 	}
 
 	for _, value := range products {
@@ -69,13 +70,13 @@ func (s *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 
 	product, err := s.productRepo.GetByID(id)
 	if err != nil {
-		return resp, err
+		return resp, errors.New(reason.CategoryCannotGetDetail)
 	}
 
 	categoryID := strconv.Itoa(product.CategoryID)
 	category, err := s.categoryRepo.GetByID(categoryID)
 	if err != nil {
-		return resp, err
+		return resp, errors.New(reason.CategoryNotFound)
 	}
 
 	resp = schema.DetailProductResp{
@@ -100,7 +101,7 @@ func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) err
 
 	oldData, err := s.productRepo.GetByID(id)
 	if err != nil {
-		return errors.New("product not found")
+		return errors.New(reason.ProductNotFound)
 	}
 
 	updateData.ID = oldData.ID
@@ -113,7 +114,7 @@ func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) err
 
 	if err = s.productRepo.Update(updateData); err != nil {
 		fmt.Println(err)
-		return errors.New("cannot update category")
+		return errors.New(reason.CategoryCannotUpdate)
 	}
 
 	return nil
@@ -122,11 +123,11 @@ func (s *ProductService) DeleteByID(id string) error {
 
 	_, err := s.productRepo.GetByID(id)
 	if err != nil {
-		return errors.New("product not found")
+		return errors.New(reason.ProductNotFound)
 	}
 
 	if err := s.productRepo.DeleteByID(id); err != nil {
-		return errors.New("cannot delete product")
+		return errors.New(reason.ProductCannotDelete)
 	}
 
 	return nil
