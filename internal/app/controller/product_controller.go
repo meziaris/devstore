@@ -26,7 +26,7 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 	}
 
 	if err := c.service.Create(req); err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot create product")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -37,7 +37,7 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 func (cc *ProductController) BrowseProduct(ctx *gin.Context) {
 	resp, err := cc.service.BrowseAll()
 	if err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot get product list")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -49,14 +49,14 @@ func (cc *ProductController) DetailProduct(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 	resp, err := cc.service.GetByID(id)
 	if err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot get product detail")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success get product detail", resp)
+	handler.ResponseSuccess(ctx, http.StatusOK, "success found the product", resp)
 }
 
-// update article by id
+// update product by id
 func (cc *ProductController) UpdateProduct(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 	req := &schema.UpdateProductReq{}
@@ -67,20 +67,20 @@ func (cc *ProductController) UpdateProduct(ctx *gin.Context) {
 
 	err := cc.service.UpdateByID(id, req)
 	if err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot update product")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	handler.ResponseSuccess(ctx, http.StatusOK, "success update product", req)
 }
 
-// delete article by id
+// delete product by id
 func (cc *ProductController) DeleteProduct(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 
 	err := cc.service.DeleteByID(id)
 	if err != nil {
-		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot delete product")
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
