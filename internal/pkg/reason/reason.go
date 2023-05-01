@@ -6,6 +6,11 @@ var (
 )
 
 var (
+	UserAlreadyExist = "user already exist"
+	RegisterFailed   = "failed to register user"
+)
+
+var (
 	CategoryNotFound        = "category not found"
 	CategoryCannotCreate    = "cannot create category"
 	CategoryCannotBrowse    = "cannot browse category"

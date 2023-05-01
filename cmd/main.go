@@ -54,14 +54,19 @@ func main() {
 	// repository
 	categoryRepository := repository.NewCategoryRepository(DBConn)
 	productRepository := repository.NewProducRepository(DBConn)
+	userRepository := repository.NewUserRepository(DBConn)
 
 	// service
 	categoryService := service.NewCategoryService(categoryRepository)
 	productService := service.NewProductService(productRepository, categoryRepository)
+	registrationService := service.NewRegistrationService(userRepository)
 
 	// controller
 	categoryController := controller.NewCategoryController(categoryService)
 	productController := controller.NewProductController(productService)
+	registrationController := controller.NewRegistrationController(registrationService)
+
+	r.POST("/auth/register", registrationController.Register)
 
 	r.GET("/category", categoryController.BrowseCategory)
 	r.POST("/category", categoryController.CreateCategory)
