@@ -13,7 +13,7 @@ var (
 	FailedLogin        = "failed to login, your email or password is incorrect"
 	FailedLogout       = "failed logout"
 	Unauthorized       = "unauthorized request"
-	FailedRefreshToken = "failed to refresh token, please check your token"
+	FailedRefreshToken = "failed to refresh token, please check your token" //nolint
 )
 
 var (
