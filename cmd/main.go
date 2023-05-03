@@ -55,19 +55,32 @@ func main() {
 	categoryRepository := repository.NewCategoryRepository(DBConn)
 	productRepository := repository.NewProducRepository(DBConn)
 	userRepository := repository.NewUserRepository(DBConn)
+	authRepository := repository.NewAuthRepository(DBConn)
 
 	// service
+	tokenCreator := service.NewTokenCreator(
+		cfg.AccessTokenKey,
+		cfg.RefreshTokenKey,
+		cfg.AccessTokenDuration,
+		cfg.RefreshTokenDuration,
+	)
 	categoryService := service.NewCategoryService(categoryRepository)
 	productService := service.NewProductService(productRepository, categoryRepository)
 	registrationService := service.NewRegistrationService(userRepository)
+	sessionService := service.NewSessionService(userRepository, authRepository, tokenCreator)
 
 	// controller
 	categoryController := controller.NewCategoryController(categoryService)
 	productController := controller.NewProductController(productService)
 	registrationController := controller.NewRegistrationController(registrationService)
+	sessionController := controller.NewSessionController(sessionService, tokenCreator)
 
 	r.POST("/auth/register", registrationController.Register)
+	r.POST("/auth/login", sessionController.Login)
+	r.GET("/auth/refresh", sessionController.Refresh)
 
+	r.Use(middleware.AuthMiddleware(tokenCreator))
+	r.GET("/auth/logout", sessionController.Logout)
 	r.GET("/category", categoryController.BrowseCategory)
 	r.POST("/category", categoryController.CreateCategory)
 	r.GET("/category/:id", categoryController.DetailCategory)

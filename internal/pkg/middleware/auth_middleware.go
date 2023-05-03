@@ -1,0 +1,56 @@
+package middleware
+
+import (
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/meziaris/devstore/internal/pkg/handler"
+	"github.com/meziaris/devstore/internal/pkg/reason"
+)
+
+type AccessTokenVerifier interface {
+	VerifyAccessToken(tokenString string) (sub string, err error)
+}
+
+func AuthMiddleware(tokenCreator AccessTokenVerifier) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		accessToken := tokenFromHeader(ctx)
+		if accessToken == "" {
+			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
+			ctx.Abort()
+			return
+		}
+
+		// verify token
+		sub, err := tokenCreator.VerifyAccessToken(accessToken)
+		if err != nil {
+			fmt.Println("SUB TOKEN", sub)
+			fmt.Println("ERR TOKEN", err)
+			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
+			ctx.Abort()
+			return
+		}
+
+		fmt.Println("SUB TOKEN", sub)
+
+		// attach sub to request (attach to ctx)
+		ctx.Set("user_id", sub)
+
+		// continue
+		ctx.Next()
+	}
+}
+
+func tokenFromHeader(ctx *gin.Context) string {
+	var accessToken string
+	bearerToken := ctx.Request.Header.Get("Authorization")
+	field := strings.Fields(bearerToken)
+
+	if len(field) != 0 && field[0] == "Bearer" {
+		accessToken = field[1]
+	}
+
+	return accessToken
+}

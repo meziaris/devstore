@@ -54,3 +54,43 @@ func (r *UserRepository) GetByEmailAndUsername(email string, username string) (m
 
 	return user, nil
 }
+
+func (r *UserRepository) GetByEmail(email string) (model.User, error) {
+	var (
+		sqlStatement = `
+			SELECT id, email, username, hashed_password
+			FROM users
+			WHERE email = $1
+			LIMIT 1
+		`
+		user model.User
+	)
+
+	err := r.DB.QueryRowx(sqlStatement, email).StructScan(&user)
+	if err != nil {
+		log.Error(fmt.Errorf("error UserRepository - GetByEmail : %w", err))
+		return user, err
+	}
+
+	return user, nil
+}
+
+func (r *UserRepository) GetByID(userID int) (model.User, error) {
+	var (
+		sqlStatement = `
+			SELECT id, email, username, hashed_password
+			FROM users
+			WHERE id = $1
+			LIMIT 1
+		`
+		user model.User
+	)
+
+	err := r.DB.QueryRowx(sqlStatement, userID).StructScan(&user)
+	if err != nil {
+		log.Error(fmt.Errorf("error UserRepository - GetByID : %w", err))
+		return user, err
+	}
+
+	return user, nil
+}

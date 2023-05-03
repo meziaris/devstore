@@ -9,11 +9,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepository interface {
-	Create(user model.User) error
-	GetByEmailAndUsername(email string, username string) (model.User, error)
-}
-
 type RegistrationService struct {
 	userRepo UserRepository
 }
