@@ -1,6 +1,8 @@
 package service
 
-import "github.com/meziaris/devstore/internal/app/schema"
+import (
+	"github.com/meziaris/devstore/internal/app/schema"
+)
 
 type ICategoryService interface {
 	Create(req schema.CreateCategoryReq) error
