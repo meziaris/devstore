@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -26,14 +25,10 @@ func AuthMiddleware(tokenCreator AccessTokenVerifier) gin.HandlerFunc {
 		// verify token
 		sub, err := tokenCreator.VerifyAccessToken(accessToken)
 		if err != nil {
-			fmt.Println("SUB TOKEN", sub)
-			fmt.Println("ERR TOKEN", err)
 			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}
-
-		fmt.Println("SUB TOKEN", sub)
 
 		// attach sub to request (attach to ctx)
 		ctx.Set("user_id", sub)
