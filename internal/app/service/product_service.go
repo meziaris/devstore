@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/meziaris/devstore/internal/app/model"
@@ -113,7 +112,6 @@ func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) err
 	updateData.CategoryID = req.CategoryID
 
 	if err = s.productRepo.Update(updateData); err != nil {
-		fmt.Println(err)
 		return errors.New(reason.CategoryCannotUpdate)
 	}
 

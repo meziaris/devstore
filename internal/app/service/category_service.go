@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/meziaris/devstore/internal/app/model"
 	"github.com/meziaris/devstore/internal/app/repository"
@@ -37,7 +36,6 @@ func (cs *CategoryService) BrowseAll() ([]schema.GetCategoryResp, error) {
 
 	categories, err := cs.repo.Browse()
 	if err != nil {
-		fmt.Println(err)
 		return nil, errors.New("cannot get categories")
 	}
 
@@ -58,7 +56,6 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 
 	category, err := cs.repo.GetByID(id)
 	if err != nil {
-		fmt.Println(err)
 		return resp, errors.New(reason.CategoryCannotGetDetail)
 	}
 
@@ -85,7 +82,6 @@ func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) e
 
 	err = cs.repo.Update(updateData)
 	if err != nil {
-		fmt.Println(err)
 		return errors.New("cannot update category")
 	}
 
@@ -102,7 +98,6 @@ func (cs *CategoryService) DeleteByID(id string) error {
 
 	err = cs.repo.DeleteByID(id)
 	if err != nil {
-		fmt.Println(err)
 		return errors.New("cannot delete category")
 	}
 
