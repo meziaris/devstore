@@ -1,4 +1,4 @@
-# Devtore
+# Devstore
 
 ## Package
 
@@ -29,7 +29,6 @@ You can run `make help` for showing all available commands :
 ```bash
 ❯ make help
 environment                    Setup environment.
-help                           You are here! showing all command documenentation.
 migrate-all                    Rollback migrations, all migrations
 migrate-create                 Create a DB migration files e.g `make migrate-create name=migration-name`
 migrate-down                   Rollback migrations, latest migration (1)
