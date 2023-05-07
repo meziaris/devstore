@@ -15,3 +15,8 @@ type UpdateCategoryReq struct {
 	Name        string `form:"name" json:"name" validate:"required"`
 	Description string `form:"description" json:"description" validate:"required"`
 }
+
+type BrowseCategoryReq struct {
+	Page  int
+	Limit int
+}

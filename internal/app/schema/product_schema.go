@@ -22,6 +22,11 @@ type CreateProductResp struct {
 	Image       string `json:"image"`
 }
 
+type BrowseProductReq struct {
+	Page  int
+	Limit int
+}
+
 type BrowseProductResp struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
