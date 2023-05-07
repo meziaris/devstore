@@ -46,7 +46,11 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 
 // get all Product
 func (cc *ProductController) BrowseProduct(ctx *gin.Context) {
-	resp, err := cc.service.BrowseAll()
+	req := schema.BrowseProductReq{
+		Page:  ctx.GetInt("page"),
+		Limit: ctx.GetInt("limit"),
+	}
+	resp, err := cc.service.BrowseAll(req)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return

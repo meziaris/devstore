@@ -62,10 +62,11 @@ func (s *ProductService) Create(req *schema.CreateProductReq) (imageURL string, 
 	return imageURL, nil
 }
 
-func (s *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
+func (s *ProductService) BrowseAll(req schema.BrowseProductReq) ([]schema.BrowseProductResp, error) {
 	var resp []schema.BrowseProductResp
 
-	products, err := s.productRepo.Browse()
+	dbSearch := model.BrowseProduct{Page: req.Page, Limit: req.Limit}
+	products, err := s.productRepo.Browse(dbSearch)
 	if err != nil {
 		return resp, errors.New(reason.ProductCannotBrowse)
 	}

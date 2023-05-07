@@ -87,13 +87,13 @@ func main() {
 
 	r.Use(middleware.AuthMiddleware(tokenCreator))
 	r.GET("/auth/logout", sessionController.Logout)
-	r.GET("/category", categoryController.BrowseCategory)
+	r.GET("/category", middleware.PaginationMiddleware(cfg.PaginateDefaultPage, cfg.PaginateDefaultLimit), categoryController.BrowseCategory)
 	r.POST("/category", categoryController.CreateCategory)
 	r.GET("/category/:id", categoryController.DetailCategory)
 	r.PATCH("/category/:id", categoryController.UpdateCategory)
 	r.DELETE("/category/:id", categoryController.DeleteCategory)
 
-	r.GET("/product", productController.BrowseProduct)
+	r.GET("/product", middleware.PaginationMiddleware(cfg.PaginateDefaultPage, cfg.PaginateDefaultLimit), productController.BrowseProduct)
 	r.POST("/product", productController.CreateProduct)
 	r.GET("/product/:id", productController.DetailProduct)
 	r.PATCH("/product/:id", productController.UpdateProduct)

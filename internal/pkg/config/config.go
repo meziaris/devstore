@@ -19,6 +19,8 @@ type Config struct {
 	CloudinaryApiKey       string        `mapstructure:"CLOUDINARY_API_KEY"`
 	CloudinaryApiSecret    string        `mapstructure:"CLOUDINARY_API_SECRET"`
 	CloudinaryUploadFolder string        `mapstructure:"CLOUDINARY_UPLOAD_FOLDER"`
+	PaginateDefaultPage    int           `mapstructure:"PAGINATE_DEFAULT_PAGE"`
+	PaginateDefaultLimit   int           `mapstructure:"PAGINATE_DEFAULT_LIMIT"`
 }
 
 func LoadConfig(fileConfigPath string) (Config, error) {

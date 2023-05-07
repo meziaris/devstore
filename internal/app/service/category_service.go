@@ -31,10 +31,11 @@ func (cs *CategoryService) Create(req schema.CreateCategoryReq) error {
 }
 
 // get list category
-func (cs *CategoryService) BrowseAll() ([]schema.GetCategoryResp, error) {
+func (cs *CategoryService) BrowseAll(req schema.BrowseCategoryReq) ([]schema.GetCategoryResp, error) {
 	var resp []schema.GetCategoryResp
 
-	categories, err := cs.repo.Browse()
+	dbSearch := model.BrowseCategory{Page: req.Page, Limit: req.Limit}
+	categories, err := cs.repo.Browse(dbSearch)
 	if err != nil {
 		return nil, errors.New("cannot get categories")
 	}

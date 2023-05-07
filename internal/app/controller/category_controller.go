@@ -35,7 +35,11 @@ func (cc *CategoryController) CreateCategory(ctx *gin.Context) {
 
 // get all category
 func (cc *CategoryController) BrowseCategory(ctx *gin.Context) {
-	resp, err := cc.service.BrowseAll()
+	req := schema.BrowseCategoryReq{
+		Page:  ctx.GetInt("page"),
+		Limit: ctx.GetInt("limit"),
+	}
+	resp, err := cc.service.BrowseAll(req)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, "cannot get category list")
 		return
