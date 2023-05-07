@@ -13,9 +13,9 @@ type ICategoryService interface {
 }
 
 type IProductService interface {
-	Create(req *schema.CreateProductReq) error
+	Create(req *schema.CreateProductReq) (imageURL string, err error)
 	BrowseAll() ([]schema.BrowseProductResp, error)
 	GetByID(id string) (schema.DetailProductResp, error)
-	UpdateByID(id string, req *schema.UpdateProductReq) error
+	UpdateByID(id string, req *schema.UpdateProductReq) (imageURL string, err error)
 	DeleteByID(id string) error
 }

@@ -11,9 +11,10 @@ type ICategoryRepository interface {
 }
 
 type IProductRepository interface {
-	Create(product model.Product) error
+	Create(product model.Product) (productID int, err error)
 	Browse() ([]model.Product, error)
 	GetByID(id string) (model.Product, error)
 	Update(product model.Product) error
+	UpdateImageURL(id int, imageURL string) error
 	DeleteByID(id string) error
 }

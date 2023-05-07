@@ -17,25 +17,36 @@ func NewProducRepository(db *sqlx.DB) *ProductRepository {
 	return &ProductRepository{DB: db}
 }
 
-func (r *ProductRepository) Create(product model.Product) error {
-	sqlStatement := `
-			INSERT INTO products (name, description, currency, total_stock, is_active, category_id)
-			VALUES ($1, $2, $3, $4, $5, $6)
-	`
-	_, err := r.DB.Exec(sqlStatement, product.Name, product.Description, product.Currency, product.TotalStock, product.IsActive, product.CategoryID)
+func (r *ProductRepository) Create(product model.Product) (productID int, err error) {
+	var (
+		id           int
+		sqlStatement = `
+			INSERT INTO products (name,description,currency,total_stock,is_active,category_id)
+			VALUES (:name, :description, :currency, :total_stock, :is_active, :category_id)
+			RETURNING id
+		`
+	)
+
+	stmt, err := r.DB.PrepareNamed(sqlStatement)
 	if err != nil {
-		log.Error(fmt.Errorf("error ProductRepository - Create : %w", err))
-		return err
+		log.Error(fmt.Errorf("error ProductRepository - PrepareNamed : %w", err))
+		return 0, err
 	}
 
-	return nil
+	err = stmt.Get(&id, product)
+	if err != nil {
+		log.Error(fmt.Errorf("error ProductRepository - Create : %w", err))
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (r *ProductRepository) Browse() ([]model.Product, error) {
 	var (
 		products     []model.Product
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 		`
 	)
@@ -61,7 +72,7 @@ func (r *ProductRepository) GetByID(id string) (model.Product, error) {
 	var (
 		product      model.Product
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 			WHERE id = $1
 		`
@@ -101,6 +112,29 @@ func (r *ProductRepository) Update(product model.Product) error {
 	)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Update : %w", err))
+		return err
+	}
+
+	totalAffected, _ := result.RowsAffected()
+	if totalAffected <= 0 {
+		return errors.New("no record affected")
+	}
+
+	return nil
+}
+
+func (r *ProductRepository) UpdateImageURL(id int, imageURL string) error {
+	var (
+		sqlStatement = `
+			UPDATE products
+			SET updated_at = NOW(), image_url = $2
+			WHERE id = $1
+		`
+	)
+
+	result, err := r.DB.Exec(sqlStatement, id, imageURL)
+	if err != nil {
+		log.Error(fmt.Errorf("error ProductRepository - UpdateImageURL : %w", err))
 		return err
 	}
 

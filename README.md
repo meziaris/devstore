@@ -9,6 +9,7 @@
 * Logging: [logrus](github.com/sirupsen/logrus)
 * JWT: [golang-jwt](github.com/golang-jwt/jwt)
 * Database: PostgreSQL
+* Image Storage: [cloudinary-go](github.com/cloudinary/cloudinary-go/v2)
 
 ## Prerequisites
 

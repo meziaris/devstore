@@ -25,12 +25,23 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.Create(req); err != nil {
+	imageULR, err := c.service.Create(req)
+	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success ceate product", req)
+	resp := schema.CreateProductResp{
+		Name:        req.Name,
+		Description: req.Description,
+		Currency:    req.Currency,
+		TotalStock:  req.TotalStock,
+		IsActive:    req.IsActive,
+		CategoryID:  req.CategoryID,
+		Image:       imageULR,
+	}
+
+	handler.ResponseSuccess(ctx, http.StatusOK, "success ceate product", resp)
 }
 
 // get all Product
@@ -65,13 +76,23 @@ func (cc *ProductController) UpdateProduct(ctx *gin.Context) {
 		return
 	}
 
-	err := cc.service.UpdateByID(id, req)
+	imageURL, err := cc.service.UpdateByID(id, req)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success update product", req)
+	resp := schema.UpdateProductResp{
+		Name:        req.Name,
+		Description: req.Description,
+		Currency:    req.Currency,
+		TotalStock:  req.TotalStock,
+		IsActive:    req.IsActive,
+		CategoryID:  req.CategoryID,
+		Image:       imageURL,
+	}
+
+	handler.ResponseSuccess(ctx, http.StatusOK, "success update product", resp)
 }
 
 // delete product by id
