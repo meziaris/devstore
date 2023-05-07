@@ -55,8 +55,7 @@ func (s *ProductService) Create(req *schema.CreateProductReq) (imageURL string, 
 		return "", errors.New(reason.CategoryCannotCreate)
 	}
 
-	s.productRepo.UpdateImageURL(productID, imageURL)
-	if err != nil {
+	if err := s.productRepo.UpdateImageURL(productID, imageURL); err != nil {
 		return "", errors.New(reason.CategoryCannotCreate)
 	}
 
@@ -144,8 +143,7 @@ func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) (im
 		return "", errors.New(reason.ProductCannotUpdate)
 	}
 
-	s.productRepo.UpdateImageURL(updateData.ID, imageURL)
-	if err != nil {
+	if err := s.productRepo.UpdateImageURL(updateData.ID, imageURL); err != nil {
 		return "", errors.New(reason.ProductCannotUpdate)
 	}
 
