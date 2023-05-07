@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"mime/multipart"
 	"strconv"
 
 	"github.com/meziaris/devstore/internal/app/model"
@@ -10,16 +11,25 @@ import (
 	"github.com/meziaris/devstore/internal/pkg/reason"
 )
 
+type ImageUploader interface {
+	UploadImage(userID string, input *multipart.FileHeader) (imageURL string, err error)
+}
+
 type ProductService struct {
-	productRepo  repository.IProductRepository
-	categoryRepo repository.ICategoryRepository
+	productRepo   repository.IProductRepository
+	categoryRepo  repository.ICategoryRepository
+	imageUploader ImageUploader
 }
 
-func NewProductService(pr repository.IProductRepository, cr repository.ICategoryRepository) *ProductService {
-	return &ProductService{productRepo: pr, categoryRepo: cr}
+func NewProductService(pr repository.IProductRepository, cr repository.ICategoryRepository, uploader ImageUploader) *ProductService {
+	return &ProductService{
+		productRepo:   pr,
+		categoryRepo:  cr,
+		imageUploader: uploader,
+	}
 }
 
-func (s *ProductService) Create(req *schema.CreateProductReq) error {
+func (s *ProductService) Create(req *schema.CreateProductReq) (imageURL string, err error) {
 	inserData := model.Product{
 		Name:        req.Name,
 		Description: req.Description,
@@ -31,14 +41,26 @@ func (s *ProductService) Create(req *schema.CreateProductReq) error {
 
 	categoryID := strconv.Itoa(req.CategoryID)
 	if _, err := s.categoryRepo.GetByID(categoryID); err != nil {
-		return errors.New(reason.CategoryNotFound)
+		return "", errors.New(reason.CategoryNotFound)
 	}
 
-	if err := s.productRepo.Create(inserData); err != nil {
-		return err
+	productID, err := s.productRepo.Create(inserData)
+
+	if err != nil {
+		return "", errors.New(reason.CategoryCannotCreate)
 	}
 
-	return nil
+	imageURL, err = s.imageUploader.UploadImage(strconv.Itoa(productID), req.Image)
+	if err != nil {
+		return "", errors.New(reason.CategoryCannotCreate)
+	}
+
+	s.productRepo.UpdateImageURL(productID, imageURL)
+	if err != nil {
+		return "", errors.New(reason.CategoryCannotCreate)
+	}
+
+	return imageURL, nil
 }
 
 func (s *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
@@ -57,6 +79,7 @@ func (s *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
 			Currency:    value.Currency,
 			TotalStock:  value.TotalStock,
 			IsActive:    value.IsActive,
+			ImageURL:    value.ImageURL,
 		}
 		resp = append(resp, respData)
 	}
@@ -90,17 +113,18 @@ func (s *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 			Name:        category.Name,
 			Description: category.Description,
 		},
+		ImageURL: product.ImageURL,
 	}
 
 	return resp, nil
 }
 
-func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) error {
+func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) (imageURL string, err error) {
 	updateData := model.Product{}
 
 	oldData, err := s.productRepo.GetByID(id)
 	if err != nil {
-		return errors.New(reason.ProductNotFound)
+		return "", errors.New(reason.ProductNotFound)
 	}
 
 	updateData.ID = oldData.ID
@@ -112,11 +136,22 @@ func (s *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) err
 	updateData.CategoryID = req.CategoryID
 
 	if err = s.productRepo.Update(updateData); err != nil {
-		return errors.New(reason.CategoryCannotUpdate)
+		return "", errors.New(reason.ProductCannotUpdate)
 	}
 
-	return nil
+	imageURL, err = s.imageUploader.UploadImage(strconv.Itoa(updateData.ID), req.Image)
+	if err != nil {
+		return "", errors.New(reason.ProductCannotUpdate)
+	}
+
+	s.productRepo.UpdateImageURL(updateData.ID, imageURL)
+	if err != nil {
+		return "", errors.New(reason.ProductCannotUpdate)
+	}
+
+	return imageURL, nil
 }
+
 func (s *ProductService) DeleteByID(id string) error {
 
 	_, err := s.productRepo.GetByID(id)
