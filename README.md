@@ -18,7 +18,7 @@
 ## Running Locally
 
 1. `make environment`
-2. `make migration-up`
+2. `make migrate-up`
 3. `cp app.env.sample app.env`, adjust the value
 5. `make server`
 6. App running!
